@@ -1,0 +1,13 @@
+{
+  "contributions": [
+    {
+      "id": "resources-dialog",
+      "type": "ms.vss-web.external-content",
+      "targets": [],
+      "properties": {
+        "registeredObjectId": "unutilized-resources-dialog",
+        "uri": "dist/app/app.html"
+      }
+    }
+  ]
+}

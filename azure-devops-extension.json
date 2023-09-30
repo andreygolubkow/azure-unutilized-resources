@@ -1,0 +1,41 @@
+{
+  "manifestVersion": 1,
+  "id": "unutilized-resources-panel",
+  "publisher": "AndreiGolubkov",
+  "version": "1.0.41",
+  "name": "Unutilized resources",
+  "description": "Planned, but unused resources for iteration",
+  "categories": [
+    "Azure Boards"
+  ],
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "scopes": ["vso.project", "vso.work"],
+  "icons": {
+    "default": "static/logo.png"
+  },
+  "content": {
+    "details": {
+      "path": "overview.md"
+    },
+    "license": {
+      "path": "LICENSE.md"
+    }
+  },
+  "files": [
+    {
+      "path": "static",
+      "addressable": true
+    },
+    {
+      "path": "dist",
+      "addressable": true
+    }
+  ],
+  "galleryFlags": [
+    "Preview"
+  ]
+}
