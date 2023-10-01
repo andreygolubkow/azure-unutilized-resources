@@ -16,6 +16,7 @@ export interface IAzureService {
 }
 
 const MAX_WORK_ITEMS = 100;
+const UNSAASIGNED_ACTIVITY = "Unassigned";
 class AzureProperties {
     public static Id = "System.Id";
     public static Title = "System.Title";
@@ -86,19 +87,23 @@ export class AzureService implements IAzureService{
             }
             console.log(`${m.teamMember.displayName} working days: ${workingDays}`);
             m.activities.forEach(act => {
-                const activityName = act.name ? act.name : "Unassigned";
+                const activityName = act.name ? act.name : UNSAASIGNED_ACTIVITY;
                 if (!teamCapacity.hasOwnProperty(activityName))
                     teamCapacity[activityName] = 0;
                 teamCapacity[activityName] += act.capacityPerDay * workingDays;
             });
         });
-        await this.getUtilizedCapacity();
+        const utilized = await this.getUtilizedCapacity();
         return Object.keys(teamCapacity)
-            .map(c => new TeamCapacity(c, teamCapacity[c], 0, 0));
+            .map(c => new TeamCapacity(
+                c, 
+                teamCapacity[c],
+                utilized[c] ?? 0, 
+                (teamCapacity[c] - (utilized[c] ?? 0))));
         
     }
     
-    public async getUtilizedCapacity(){
+    public async getUtilizedCapacity(): Promise<{[activity: string]: number}> {
         const teamContext: TfsCore.TeamContext = this.teamContext;
         const iterations = await this.workRestClient.getTeamIterations(teamContext, TimeFrame[TimeFrame.Current]);
         //get first(current) iteration
@@ -113,8 +118,13 @@ export class AzureService implements IAzureService{
         const historyRequest = wiqlResult.workItems
             .map((i) => this.getCompletedWorkPerItem(i.id, iteration.attributes.startDate));
         const historyResult = (await Promise.all(historyRequest));
+        const activityTime = historyResult.reduce((group:{[activity:string]:number}, current) => {
+            if (!group.hasOwnProperty(current.activity)) group[current.activity] = 0;
+            group[current.activity] += current.completedWork;
+            return group;
+        }, {})
         
-        console.log(historyResult);
+        return activityTime;
     }
     
     private get teamContext(): TeamContext {
@@ -143,34 +153,44 @@ export class AzureService implements IAzureService{
         const maxEvents = 50;
         let lastLoaded = 0;
         let history: WorkItem[] = [];
+        console.log(`Start loading history for ${workItemId}`);
         do {
             const data = await this.workItemTrackingClient.getRevisions(workItemId, teamContext.project, maxEvents, history.length, WorkItemExpand.Fields);
             history = history.concat(data);
             lastLoaded = data.length;
         } while (lastLoaded === maxEvents);
+        console.log(`We have ${history.length} records for ${workItemId}`);
         // Now we have all history for item, let's find changes in Completed Work field
         let completedWork = 0;
-        if (history.length === 0) return {
-            activity: '',
+        if (!history || history.length === 0) return {
+            activity: UNSAASIGNED_ACTIVITY,
             id: workItemId,
             completedWork: 0
         };
         let latestActivityValue = history[history.length-1].fields[AzureProperties.Activity].toString();
         for (let i = 0; i < history.length; i++) {
             if (!this.hasChangesInIteration(history[i], iterationStartDate)) {
-                console.log(`Nothing changes in current iteration for ${workItemId}`);
+                console.log(`${workItemId}: Nothing changes at ${i} revision`);
                 continue;
             }
-            if (i === 0 && history[i].fields[AzureProperties.CompletedWork] !== 0) {
-                completedWork += history[i].fields[AzureProperties.CompletedWork];
-                console.log(`Found first changing for ${workItemId}: ${history[i].fields[AzureProperties.CompletedWork]}`);
+            const itemCompletedWork = isNaN(history[i].fields[AzureProperties.CompletedWork]) 
+                ? 0
+                : history[i].fields[AzureProperties.CompletedWork];
+            if (i === 0 && itemCompletedWork !== 0) {
+                completedWork += itemCompletedWork;
+                console.log(`${workItemId}: It's a first item, CW: ${itemCompletedWork}`);
                 continue;
             }
-            console.log(`Revision ${history[i].rev}; Completed Work: ${history[i].fields[AzureProperties.CompletedWork]}`);
-            const diff = history[i].fields[AzureProperties.CompletedWork] - history[i-1].fields[AzureProperties.CompletedWork]
+            const prevRevCompletedWork = !history[i-1] || isNaN(history[i-1].fields[AzureProperties.CompletedWork])
+                ? 0
+                : history[i-1].fields[AzureProperties.CompletedWork];
+            console.log(`${workItemId}: Time of prev. item ${prevRevCompletedWork}`);
+            const diff = itemCompletedWork - prevRevCompletedWork
+            console.log(`${workItemId}: Diff = ${diff}`);
             completedWork += diff;
-            console.log(`Previous CW: ${history[i-1].fields[AzureProperties.CompletedWork]}; Diff: ${diff}`);
+            console.log(`${workItemId}: CW = ${completedWork}`);
         }
+
         return new WorkItemCompletedWork(workItemId, latestActivityValue, completedWork > 0 ? completedWork : 0);
     }
     

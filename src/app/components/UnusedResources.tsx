@@ -1,7 +1,9 @@
 import * as React from "react";
-import {useQueries, useQuery} from "@tanstack/react-query";
+import {useQuery} from "@tanstack/react-query";
 import {IAzureService} from "../services/AzureService";
 import {TeamCapacity} from "../models/teamcapacity";
+import {Spinner, SpinnerSize} from "azure-devops-ui/Spinner";
+import {MessageCard, MessageCardSeverity} from "azure-devops-ui/MessageCard";
 
 export interface IUnusedResourcesProps {
     azureService: IAzureService
@@ -11,13 +13,23 @@ export default function UnusedResources(props: IUnusedResourcesProps): JSX.Eleme
     const { isLoading, error, data } = useQuery({
         queryKey: ['teamCapacity'],
         queryFn: () =>
-            props.azureService.getCapacity().then(res => res)
-    });
+            props.azureService.getCapacity().then(res => res),
+        refetchOnWindowFocus: false
+    },);
 
-    if (isLoading) return <p>Loading...</p>
+    if (isLoading) return <Spinner size={SpinnerSize.large} label="loading"></Spinner>
 
-    if (error) { // @ts-ignore
-        return <p>Error {error?.message}</p>
+    if (error) {
+        return <MessageCard
+            className="flex-self-stretch"
+            severity={MessageCardSeverity.Error}
+        >
+            {
+                //@ts-ignore
+                error?.message
+            }
+        </MessageCard>
+
     }
 
     return (<>
@@ -27,12 +39,16 @@ export default function UnusedResources(props: IUnusedResourcesProps): JSX.Eleme
 
 function ActivityCapacity(props: {capacity: TeamCapacity}): JSX.Element {
     const capacity = props.capacity;
-    return <p>
-        <h6>{capacity.activity}</h6>
-        <ul>
-            <li><b>Total hours:</b>{capacity.totalCapacityInHours}</li>
-            <li><b>Used hours:</b>{capacity.utilizedCapacityInHours}</li>
-            <li><b>Unused hours:</b>{capacity.unutilizedCapacityInHours}</li>
-        </ul>
-    </p>
+    return <div className="flex-column">
+        <div className="flex-row flex-grow flex-center padding-bottom-8">
+            <div className="title-xs">{capacity.activity}</div>
+        </div>
+        <div className="flex-row flex-grow">
+            <ul style={{listStyle: "none"}}>
+                <li><b>Total capacity:</b>{capacity.totalCapacityInHours}</li>
+                <li><b>Completed hours:</b>{capacity.utilizedCapacityInHours}</li>
+                <li><b>Unused hours:</b>{capacity.unutilizedCapacityInHours}</li>
+            </ul>
+        </div>
+    </div>
 }
