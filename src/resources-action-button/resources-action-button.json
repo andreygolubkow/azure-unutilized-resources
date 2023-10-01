@@ -8,7 +8,10 @@
       ],
       "properties": {
         "title": "Unutilized resources",
-        "icon": "static/logo16.png",
+        "icon": {
+          "light": "static/button-light.png",
+          "dark": "static/button-dark.png"
+        },
         "uri": "dist/resources-action-button/resources-action-button.html",
         "group": "actions",
         "registeredObjectId": "open-unutilized-resourced-action"

@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "unutilized-resources-panel",
   "publisher": "AndreiGolubkov",
-  "version": "1.0.41",
+  "version": "1.0.51",
   "name": "Unutilized resources",
   "description": "Planned, but unused resources for iteration",
   "categories": [
@@ -36,6 +36,6 @@
     }
   ],
   "galleryFlags": [
-    "Preview"
+    "Public"
   ]
 }
