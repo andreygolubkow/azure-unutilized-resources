@@ -41,13 +41,13 @@ function ActivityCapacity(props: {capacity: TeamCapacity}): JSX.Element {
     const capacity = props.capacity;
     return <div className="flex-column">
         <div className="flex-row flex-grow flex-center padding-bottom-8">
-            <div className="title-xs">{capacity.activity}</div>
+            <div className="title-m">{capacity.activity}</div>
         </div>
         <div className="flex-row flex-grow">
             <ul style={{listStyle: "none"}}>
-                <li><b>Total capacity:</b>{capacity.totalCapacityInHours}</li>
-                <li><b>Completed hours:</b>{capacity.utilizedCapacityInHours}</li>
-                <li><b>Unused hours:</b>{capacity.unutilizedCapacityInHours}</li>
+                <li><div className="title-s">Total capacity:</div>{capacity.totalCapacityInHours}</li>
+                <li><div className="title-s">Completed hours:</div>{capacity.utilizedCapacityInHours}</li>
+                <li><div className="title-s">Unused hours:</div>{capacity.unutilizedCapacityInHours}</li>
             </ul>
         </div>
     </div>
