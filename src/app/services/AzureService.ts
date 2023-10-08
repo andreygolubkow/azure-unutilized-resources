@@ -78,12 +78,10 @@ export class AzureService implements IAzureService {
             .flatMap(m => m.activities)
             .flatMap(a => a.name);
         return activities
-            .filter((item, index) => activities.indexOf(item) === index)
-            .map(act => act.length === 0 ? UNSAASIGNED_ACTIVITY : act);
+            .filter((item, index) => activities.indexOf(item) === index && item.length > 0);
     }
 
     public async getCapacity(activity: string): Promise<TeamCapacity> {
-        if (activity === UNSAASIGNED_ACTIVITY) activity = '';
         const teamContext: TfsCore.TeamContext = this.teamContext;
         const iterations = await this.workRestClient.getTeamIterations(teamContext, TimeFrame[TimeFrame.Current]);
         //get first(current) iteration
@@ -138,7 +136,7 @@ export class AzureService implements IAzureService {
         const iteration = iterations[0];
 
         const wiqlQuery = {query: getTrackedWorkItemsWiql(teamContext.project, iteration.path, activity, iteration.attributes.startDate)};
-        const wiqlResult = await this.workItemTrackingClient.queryByWiql(wiqlQuery, undefined, undefined, undefined, MAX_WORK_ITEMS);
+        const wiqlResult = await this.workItemTrackingClient.queryByWiql(wiqlQuery, undefined, undefined, true, MAX_WORK_ITEMS);
         if (wiqlResult.workItems.length >= MAX_WORK_ITEMS)
             console.warn(`[${ExtensionConstants.extensionTitle}] Too much work items in iteration. Results might be inaccurate`);
         // Collecting only last 50 changes for each item
