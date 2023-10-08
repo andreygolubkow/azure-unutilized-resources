@@ -15,20 +15,20 @@
     "test": "cross-env TEST_REPORT_FILENAME=test-results.xml jest --verbose"
   },
   "dependencies": {
-    "@tanstack/react-query": "^4.35.3",
-    "azure-devops-extension-api": "^2.225.0",
-    "azure-devops-extension-sdk": "^3.1.2",
-    "azure-devops-ui": "^2.167.63",
-    "react": "~16.13.1",
-    "react-dom": "~16.13.1"
+    "@fluentui/react-components": "9.34.1",
+    "@tanstack/react-query": "4.35.3",
+    "azure-devops-extension-api": "2.225.0",
+    "azure-devops-extension-sdk": "3.1.2",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.21.8",
     "@testing-library/jest-dom": "^5.11.0",
     "@testing-library/react": "^10.4.4",
     "@types/jest": "^26.0.3",
-    "@types/react": "~16.8.2",
-    "@types/react-dom": "~16.8.0",
+    "@types/react": "18.2.0",
+    "@types/react-dom": "18.2.0",
     "base64-inline-loader": "^2.0.1",
     "copy-webpack-plugin": "^7.0.0",
     "cross-env": "^7.0.3",

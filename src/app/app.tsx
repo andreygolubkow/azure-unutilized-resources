@@ -1,10 +1,9 @@
 import * as React from "react";
 import { showRootComponent } from "../Common";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import UnusedResources from "./components/UnusedResources";
+import UnusedResourcesPage from "./components/UnusedResourcesPage";
 import {AzureService} from "./services/AzureService";
-import "azure-devops-ui/Core/_platformCommon.scss";
-import "azure-devops-ui/Core/core.css";
+import {FluentProvider, teamsLightTheme} from "@fluentui/react-components";
 
 interface IAppState {
     isSdkReady: boolean
@@ -29,9 +28,11 @@ class App extends React.Component<{}, IAppState> {
 
     render(): JSX.Element {
         return (
+            <FluentProvider theme={teamsLightTheme}>
             <QueryClientProvider client={this.queryClient}>
-                <UnusedResources azureService={azureService}/>
+                <UnusedResourcesPage azureService={azureService}/>
             </QueryClientProvider>
+            </FluentProvider>
         );
     }
 }

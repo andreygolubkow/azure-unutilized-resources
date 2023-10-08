@@ -22,6 +22,7 @@ module.exports = {
         alias: {
             "azure-devops-extension-sdk": path.resolve("node_modules/azure-devops-extension-sdk")
         },
+        modules: [path.resolve("."), "node_modules"]
     },
     stats: {
         warnings: false
@@ -34,7 +35,7 @@ module.exports = {
             },
             {
                 test: /\.scss$/,
-                use: ["style-loader", "css-loader", "azure-devops-ui/buildScripts/css-variables-loader", "sass-loader"]
+                use: ["style-loader", "css-loader","sass-loader"]
             },
             {
                 test: /\.css$/,
