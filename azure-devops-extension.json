@@ -13,16 +13,24 @@
       "id": "Microsoft.VisualStudio.Services"
     }
   ],
-  "scopes": ["vso.project", "vso.work"],
+  "scopes": ["vso.work"],
   "icons": {
     "default": "static/logo.png"
   },
+  "screenshots": [
+    {
+      "path": "static/screenshot.png"
+    }
+  ],
   "content": {
     "details": {
       "path": "overview.md"
     },
     "license": {
       "path": "LICENSE.md"
+    },
+    "privacy": {
+      "path": "PRIVACY.md"
     }
   },
   "files": [
