@@ -192,7 +192,7 @@ export class AzureService implements IAzureService {
             id: workItemId,
             completedWork: 0
         };
-        let latestActivityValue = history[history.length - 1].fields[AzureProperties.Activity].toString();
+        let latestActivityValue = history[history.length - 1].fields[AzureProperties.Activity]?.toString() ?? "";
         for (let i = 0; i < history.length; i++) {
             if (!this.hasChangesInIteration(history[i], iterationStartDate)) {
                 this._logWrite(`${workItemId}: Nothing changes at ${i} revision`);
