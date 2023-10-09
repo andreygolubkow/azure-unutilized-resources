@@ -37,10 +37,9 @@ const getTrackedWorkItemsWiql = (projectName: string, iterationPath: string, act
     FROM workitems
     WHERE
         [System.TeamProject] = '${projectName}'
+      AND ([System.WorkItemType] = 'Bug' OR [System.WorkItemType] = 'Task')
       AND (
         [System.IterationPath] = '${iterationPath}'
-      AND [System.WorkItemType] = 'Bug'
-       OR [System.WorkItemType] = 'Task'
       AND [${AzureProperties.CompletedWork}]
         > 0
       AND [${AzureProperties.Activity}] = '${activity}'
@@ -97,7 +96,7 @@ export class AzureService implements IAzureService {
         capacity.teamMembers.forEach((m) => {
             let workingDays = 0;
             this._logWrite(`Start computation for ${m.teamMember.displayName}`);
-            for (let day = iteration.attributes.startDate; day <= iteration.attributes.finishDate; day.setUTCDate(day.getUTCDate() + 1)) {
+            for (let day = new Date(iteration.attributes.startDate); day <= iteration.attributes.finishDate; day.setUTCDate(day.getUTCDate() + 1)) {
                 if (!workingDaysEnum.includes(day.getUTCDay())) {
                     this._logWrite(`${day} is rejected: not working day`);
                     continue;
